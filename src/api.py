@@ -1,7 +1,4 @@
 
-
-
-
 import os
 from flask import Flask, request, Blueprint, jsonify
 from tinydb import TinyDB, Query, where
@@ -17,7 +14,9 @@ def put_key(key, value):
   #if the key already exists in the db must update
   User = Query()
   if(db.search(User.name==key)):
-    db.update({'name': key, 'score': value})
+    db.remove(User.name == key) #fix this so you just update the value
+    db.insert({'name': key, 'score': value})
+
     return jsonify(status=200)
   
   # key does not already have a value set
