@@ -1,6 +1,8 @@
 
 import os
 from flask import Flask, request, Blueprint, jsonify
+from flask_cors import cross_origin
+
 from tinydb import TinyDB, Query, where
 from tinydb.operations import delete
 from src import db
@@ -9,8 +11,11 @@ from src import db
 api = Blueprint('api', __name__)
 
 
+
 @api.route("/api/<string:key>/<float:value>", methods=['PUT'])
-def put_key(key, value):  
+def put_key(key, value):
+
+
   #if the key already exists in the db must update
   User = Query()
   if(db.search(User.name==key)):
@@ -25,24 +30,29 @@ def put_key(key, value):
     return jsonify(status=200)
 
 
-
 @api.route("/api/<string:key>", methods=['GET','DELETE'])
+@cross_origin()
 def handle_key(key):
   User = Query()
   if(request.method == 'GET'):
 
     if(db.search(User.name==key)):
-      return jsonify(db.search(User.name==key))
+      response = jsonify(data=db.search(User.name==key), status=200)
+      # response.headers.add('Access-Control-Allow-Origin', '*')
+      return response
     
     else:
-      return jsonify(status=404) #fix to accurate status
+      response = jsonify(data=db.search(User.name==key), status=202)
+      # response.headers.add('Access-Control-Allow-Origin', '*')
+      return response
 
   #Method == DELETE
   else:
-
     db.remove(User.name == key)
     print("Pair deleted")
-    return jsonify(status=200)
+    response = jsonify(status=200)
+    # response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 
     
